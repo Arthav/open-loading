@@ -1,0 +1,43 @@
+{
+  "name": "open-loading",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Agent-first loading-state components and a cinematic gallery for modern AI product interfaces.",
+  "license": "MIT",
+  "author": "open-loading contributors",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/open-loading/open-loading.git"
+  },
+  "homepage": "https://github.com/open-loading/open-loading#readme",
+  "bugs": {
+    "url": "https://github.com/open-loading/open-loading/issues"
+  },
+  "type": "module",
+  "packageManager": "pnpm@9.10.0",
+  "scripts": {
+    "dev": "pnpm --filter @open-loading/gallery dev",
+    "build": "pnpm -r build",
+    "build:core": "pnpm --filter @open-loading/react build",
+    "build:gallery": "pnpm --filter @open-loading/gallery build",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "test:run": "pnpm -r test:run",
+    "validate": "pnpm --filter @open-loading/react validate:metadata",
+    "pack:core": "pnpm --filter @open-loading/react exec npm pack --dry-run",
+    "check": "pnpm validate && pnpm typecheck && pnpm test:run && pnpm build"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.1.0",
+    "@types/node": "^22.10.2",
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
+    "@vitejs/plugin-react": "^4.3.4",
+    "jsdom": "^25.0.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vite": "^5.4.21",
+    "vitest": "^2.1.8"
+  }
+}

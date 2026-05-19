@@ -1,0 +1,61 @@
+{
+  "name": "@open-loading/react",
+  "version": "0.1.0",
+  "description": "Composable React loading states with machine-readable metadata for humans and AI agents.",
+  "license": "MIT",
+  "author": "open-loading contributors",
+  "keywords": [
+    "loading",
+    "loader",
+    "react",
+    "typescript",
+    "ai",
+    "agent",
+    "accessibility",
+    "skeleton",
+    "spinner"
+  ],
+  "homepage": "https://github.com/open-loading/open-loading#readme",
+  "bugs": {
+    "url": "https://github.com/open-loading/open-loading/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/open-loading/open-loading.git",
+    "directory": "packages/core"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "!dist/test",
+    "!dist/**/*.test.*"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "validate:metadata": "tsx src/scripts/validate-metadata.ts"
+  },
+  "peerDependencies": {
+    "react": ">=18.2.0 || >=19.0.0",
+    "react-dom": ">=18.2.0 || >=19.0.0"
+  },
+  "devDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
