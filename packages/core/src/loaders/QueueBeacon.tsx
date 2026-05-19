@@ -1,5 +1,5 @@
-import type { LoaderProps } from "../types";
-import { LoaderFrame } from "./common";
+import type { LoaderProps } from "../types.js";
+import { LoaderFrame } from "./common.js";
 
 // QueueBeacon uses the shared frame so live-region copy, error tone, and
 // reduced-motion behavior stay consistent with the rest of the package.

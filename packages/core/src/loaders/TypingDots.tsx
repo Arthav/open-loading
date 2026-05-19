@@ -1,5 +1,5 @@
-import type { LoaderProps } from "../types";
-import { LoaderFrame } from "./common";
+import type { LoaderProps } from "../types.js";
+import { LoaderFrame } from "./common.js";
 
 export function TypingDots(props: LoaderProps) {
   return (

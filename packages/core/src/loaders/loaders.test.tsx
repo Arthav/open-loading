@@ -9,7 +9,7 @@ import {
   SkeletonWave,
   ThinkingOrbit,
   TypingDots
-} from "./index";
+} from "./index.js";
 
 const loaders = [
   ["ThinkingOrbit", ThinkingOrbit],

@@ -3,7 +3,7 @@ import {
   getLoaderById,
   getLoadersByCategory,
   loaders
-} from "./index";
+} from "./index.js";
 
 describe("loader registry", () => {
   it("validates all bundled loader definitions", () => {

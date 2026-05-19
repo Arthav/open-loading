@@ -7,8 +7,10 @@
 ## Install
 
 ```bash
-pnpm add @open-loading/react
+npm install @open-loading/react
 ```
+
+The published npm package is `@open-loading/react`. This workspace uses `pnpm` for development, but app users can install the library with npm like any other React dependency.
 
 Use a loader directly in React:
 
@@ -129,9 +131,18 @@ Before publishing, keep the `repository`, `homepage`, and `bugs` fields in `pack
 
 Only `packages/core` is intended for npm. The root package stays private because it owns the workspace and gallery.
 
+Publishing as `@open-loading/react` requires npm access to the `@open-loading` scope. If you do not control that scope, update `packages/core/package.json` to a package name you control before publishing.
+
 Dry-run the package before publishing:
 
 ```bash
-pnpm --filter @open-loading/react build
+pnpm check
 pnpm pack:core
+```
+
+When the dry-run looks right, publish from the package directory:
+
+```bash
+cd packages/core
+npm publish --access public
 ```

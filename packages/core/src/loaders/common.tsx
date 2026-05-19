@@ -1,5 +1,5 @@
-import type { LoaderProps } from "../types";
-import { OpenLoadingStyles } from "./styles";
+import type { LoaderProps } from "../types.js";
+import { OpenLoadingStyles } from "./styles.js";
 
 interface LoaderFrameProps extends LoaderProps {
   children: React.ReactNode;

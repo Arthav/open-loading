@@ -1,4 +1,4 @@
-import type { LoaderDefinition, LoaderPropDefinition } from "../types";
+import type { LoaderDefinition, LoaderPropDefinition } from "../types.js";
 
 const commonProps: LoaderPropDefinition[] = [
   {

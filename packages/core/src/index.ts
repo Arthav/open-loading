@@ -1,3 +1,3 @@
-export * from "./loaders";
-export * from "./registry";
-export * from "./types";
+export * from "./loaders/index.js";
+export * from "./registry/index.js";
+export * from "./types.js";

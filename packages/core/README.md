@@ -5,8 +5,10 @@ Composable React loading states with machine-readable metadata for humans and AI
 ## Install
 
 ```bash
-pnpm add @open-loading/react
+npm install @open-loading/react
 ```
+
+The package expects React and React DOM `18.2.0` or newer in the consuming app.
 
 ## Usage
 

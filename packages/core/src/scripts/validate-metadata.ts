@@ -1,4 +1,4 @@
-import { assertValidLoaderDefinitions, loaders } from "../registry";
+import { assertValidLoaderDefinitions, loaders } from "../registry/index.js";
 
 assertValidLoaderDefinitions(loaders);
 

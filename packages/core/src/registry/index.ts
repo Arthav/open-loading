@@ -1,5 +1,5 @@
-import type { LoaderDefinition } from "../types";
-import { loaderDefinitions } from "./definitions";
+import type { LoaderDefinition } from "../types.js";
+import { loaderDefinitions } from "./definitions.js";
 
 export const loaders: LoaderDefinition[] = [...loaderDefinitions];
 
