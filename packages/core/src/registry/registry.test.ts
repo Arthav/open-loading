@@ -22,6 +22,12 @@ describe("loader registry", () => {
     );
   });
 
+  it("includes a waiting-room loader", () => {
+    expect(getLoadersByCategory("waiting-room").map((loader) => loader.id)).toEqual([
+      "queue-beacon"
+    ]);
+  });
+
   it("rejects duplicate ids", () => {
     expect(() =>
       assertValidLoaderDefinitions([loaders[0], { ...loaders[1], id: loaders[0].id }])

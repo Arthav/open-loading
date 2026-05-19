@@ -7,11 +7,11 @@
   "author": "open-loading contributors",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/open-loading/open-loading.git"
+    "url": "git+https://github.com/Arthav/open-loading.git"
   },
-  "homepage": "https://github.com/open-loading/open-loading#readme",
+  "homepage": "https://github.com/Arthav/open-loading#readme",
   "bugs": {
-    "url": "https://github.com/open-loading/open-loading/issues"
+    "url": "https://github.com/Arthav/open-loading/issues"
   },
   "type": "module",
   "packageManager": "pnpm@9.10.0",

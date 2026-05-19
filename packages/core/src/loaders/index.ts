@@ -2,6 +2,7 @@ export { AIStream } from "./AIStream";
 export { ErrorRetry } from "./ErrorRetry";
 export { NeuralGalaxy } from "./NeuralGalaxy";
 export { ProgressPulse } from "./ProgressPulse";
+export { QueueBeacon } from "./QueueBeacon";
 export { SimpleSpinner } from "./SimpleSpinner";
 export { SkeletonWave } from "./SkeletonWave";
 export { ThinkingOrbit } from "./ThinkingOrbit";

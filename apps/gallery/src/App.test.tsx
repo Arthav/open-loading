@@ -32,4 +32,17 @@ describe("gallery app", () => {
     expect(screen.getByText(/"component": "ThinkingOrbit"/)).toBeInTheDocument();
     expect(screen.getByText(/"schemaVersion": "1.0"/)).toBeInTheDocument();
   });
+
+  it("renders the waiting-room loader from registry data", () => {
+    render(<App />);
+
+    fireEvent.click(screen.getByRole("button", { name: /Waiting Room/i }));
+
+    expect(
+      screen.getByRole("heading", { level: 1, name: "Queue Beacon" })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("status", { name: "Queue beacon loading state" })
+    ).toHaveTextContent("Holding your place...");
+  });
 });

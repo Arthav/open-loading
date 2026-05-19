@@ -32,6 +32,7 @@ import {
   ErrorRetry,
   NeuralGalaxy,
   ProgressPulse,
+  QueueBeacon,
   SimpleSpinner,
   SkeletonWave,
   ThinkingOrbit,

@@ -85,6 +85,7 @@ import {
   SimpleSpinner,
   TypingDots,
   ProgressPulse,
+  QueueBeacon,
   SkeletonWave,
   AIStream,
   ErrorRetry,
@@ -115,14 +116,14 @@ See [AGENTS.md](AGENTS.md) and [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Public Repo Setup
 
-This local v0 is prepared for a public GitHub repo but does not assume a remote is already configured. When the repo owner is decided, add the remote and push:
+This local v0 is prepared for the public GitHub repo at `Arthav/open-loading`:
 
 ```bash
-git remote add origin git@github.com:<owner>/open-loading.git
+git remote -v
 git push -u origin main
 ```
 
-If the owner is not `open-loading`, update the `repository`, `homepage`, and `bugs` fields in `package.json` and `packages/core/package.json` before publishing.
+Before publishing, keep the `repository`, `homepage`, and `bugs` fields in `package.json` and `packages/core/package.json` aligned with that repo.
 
 ## Publish Readiness
 

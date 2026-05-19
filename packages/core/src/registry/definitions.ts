@@ -244,5 +244,27 @@ export const loaderDefinitions = [
       avoidWhen: "Avoid in transactional or compliance-heavy screens.",
       safeToModify: ["ring count", "particle color", "duration", "message copy"]
     }
+  },
+  {
+    ...base,
+    id: "queue-beacon",
+    name: "Queue Beacon",
+    componentName: "QueueBeacon",
+    type: "waiting-room",
+    useCases: ["rate-limit wait", "capacity queue", "turn-based access"],
+    category: "waiting-room",
+    complexity: "medium",
+    supportsMessage: true,
+    supportsError: true,
+    motionLevel: "moderate",
+    tags: ["queue", "waiting-room", "capacity", "beacon"],
+    previewMessage: "Holding your place...",
+    agentNotes: {
+      schemaVersion: "1.0",
+      status: "stable",
+      addWhen: "Use when the product is reserving a user slot or waiting for capacity.",
+      avoidWhen: "Avoid for fast inline actions where a queue would imply unnecessary delay.",
+      safeToModify: ["pulse timing", "queue pip count", "message copy", "accent tone"]
+    }
   }
 ] satisfies LoaderDefinition[];

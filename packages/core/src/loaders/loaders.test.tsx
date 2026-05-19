@@ -4,6 +4,7 @@ import {
   ErrorRetry,
   NeuralGalaxy,
   ProgressPulse,
+  QueueBeacon,
   SimpleSpinner,
   SkeletonWave,
   ThinkingOrbit,
@@ -18,7 +19,8 @@ const loaders = [
   ["SkeletonWave", SkeletonWave],
   ["AIStream", AIStream],
   ["ErrorRetry", ErrorRetry],
-  ["NeuralGalaxy", NeuralGalaxy]
+  ["NeuralGalaxy", NeuralGalaxy],
+  ["QueueBeacon", QueueBeacon]
 ] as const;
 
 describe("loader components", () => {

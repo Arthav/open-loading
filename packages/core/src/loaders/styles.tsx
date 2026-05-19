@@ -238,6 +238,54 @@ export function OpenLoadingStyles(): ReactElement {
           position: absolute;
         }
 
+        .ol-queue {
+          block-size: 7rem;
+          display: inline-block;
+          inline-size: 10rem;
+          position: relative;
+        }
+
+        .ol-queue-ring {
+          animation: ol-queue-ping 2.4s ease-out infinite;
+          border: 1px solid rgba(255, 178, 46, 0.38);
+          border-radius: 999px;
+          inset: 1.2rem 1.8rem;
+          position: absolute;
+        }
+
+        .ol-queue-ring:nth-child(2) {
+          animation-delay: 0.75s;
+          inset: 0.55rem 1rem;
+          opacity: 0.72;
+        }
+
+        .ol-queue-core {
+          background:
+            radial-gradient(circle, #fff7d8 0 15%, var(--ol-accent) 16% 38%, rgba(255, 178, 46, 0.18) 39% 70%, transparent 72%);
+          border-radius: 999px;
+          block-size: 3.1rem;
+          box-shadow: 0 0 34px rgba(255, 178, 46, 0.42);
+          inline-size: 3.1rem;
+          inset-block-start: 1.95rem;
+          inset-inline-start: 3.45rem;
+          position: absolute;
+        }
+
+        .ol-queue-pip {
+          animation: ol-queue-step 1.6s ease-in-out infinite;
+          background: var(--ol-accent);
+          border-radius: 999px;
+          block-size: 0.42rem;
+          box-shadow: 0 0 16px rgba(255, 178, 46, 0.56);
+          inline-size: 0.42rem;
+          inset-block-end: 0.7rem;
+          position: absolute;
+        }
+
+        .ol-queue-pip:nth-of-type(4) { inset-inline-start: 3.55rem; }
+        .ol-queue-pip:nth-of-type(5) { animation-delay: 0.18s; inset-inline-start: 4.75rem; }
+        .ol-queue-pip:nth-of-type(6) { animation-delay: 0.36s; inset-inline-start: 5.95rem; }
+
         .ol-root[data-reduced-motion="true"] *,
         .ol-root[data-reduced-motion="true"] *::before,
         .ol-root[data-reduced-motion="true"] *::after {
@@ -288,6 +336,16 @@ export function OpenLoadingStyles(): ReactElement {
         @keyframes ol-particle {
           from { transform: rotate(0deg) translateX(6.6rem) rotate(0deg); }
           to { transform: rotate(360deg) translateX(6.6rem) rotate(-360deg); }
+        }
+
+        @keyframes ol-queue-ping {
+          0% { opacity: 0.95; transform: scale(0.76); }
+          70%, 100% { opacity: 0; transform: scale(1.18); }
+        }
+
+        @keyframes ol-queue-step {
+          0%, 100% { opacity: 0.38; transform: translateY(0); }
+          45% { opacity: 1; transform: translateY(-0.42rem); }
         }
       `}
     </style>
