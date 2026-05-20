@@ -58,7 +58,7 @@ export interface LoaderDefinition {
   supportsMessage: boolean;
   supportsError: boolean;
   motionLevel: LoaderMotionLevel;
-  packageName: "@open-loading/react";
+  packageName: "@arthav/open-loading";
   version: string;
   framework: "React + TypeScript";
   license: "MIT";

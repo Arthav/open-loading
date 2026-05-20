@@ -4,7 +4,7 @@
     "noEmit": true,
     "baseUrl": ".",
     "paths": {
-      "@open-loading/react": ["../../packages/core/src/index.ts"]
+      "@arthav/open-loading": ["../../packages/core/src/index.ts"]
     },
     "types": ["vite/client", "vitest/globals"]
   },

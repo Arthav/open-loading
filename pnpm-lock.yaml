@@ -44,7 +44,7 @@ importers:
 
   apps/gallery:
     dependencies:
-      '@open-loading/react':
+      '@arthav/open-loading':
         specifier: workspace:*
         version: link:../../packages/core
       lucide-react:

@@ -43,7 +43,7 @@ const commonProps: LoaderPropDefinition[] = [
 ];
 
 const base = {
-  packageName: "@open-loading/react" as const,
+  packageName: "@arthav/open-loading" as const,
   version: "0.1.0",
   framework: "React + TypeScript" as const,
   license: "MIT" as const,

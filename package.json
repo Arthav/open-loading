@@ -18,13 +18,13 @@
   "scripts": {
     "dev": "pnpm --filter @open-loading/gallery dev",
     "build": "pnpm -r build",
-    "build:core": "pnpm --filter @open-loading/react build",
+    "build:core": "pnpm --filter @arthav/open-loading build",
     "build:gallery": "pnpm --filter @open-loading/gallery build",
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
     "test:run": "pnpm -r test:run",
-    "validate": "pnpm --filter @open-loading/react validate:metadata",
-    "pack:core": "pnpm --filter @open-loading/react exec npm pack --dry-run",
+    "validate": "pnpm --filter @arthav/open-loading validate:metadata",
+    "pack:core": "pnpm --filter @arthav/open-loading exec npm pack --dry-run",
     "check": "pnpm validate && pnpm typecheck && pnpm test:run && pnpm build"
   },
   "devDependencies": {

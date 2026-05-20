@@ -7,15 +7,15 @@
 ## Install
 
 ```bash
-npm install @open-loading/react
+npm install @arthav/open-loading
 ```
 
-The published npm package is `@open-loading/react`. This workspace uses `pnpm` for development, but app users can install the library with npm like any other React dependency.
+The published npm package is `@arthav/open-loading`. This workspace uses `pnpm` for development, but app users can install the library with npm like any other React dependency.
 
 Use a loader directly in React:
 
 ```tsx
-import { ThinkingOrbit } from "@open-loading/react";
+import { ThinkingOrbit } from "@arthav/open-loading";
 
 export function PendingState() {
   return (
@@ -45,7 +45,7 @@ Then serve `apps/gallery/dist` with any static server.
 
 ## Project Shape
 
-- `packages/core` contains the React loader package published as `@open-loading/react`.
+- `packages/core` contains the React loader package published as `@arthav/open-loading`.
 - `apps/gallery` contains the cinematic docs/gallery app.
 - `templates/loader` contains the required starting point for new loader contributions.
 - `docs/concepts/open-loading-cinematic.png` is the approved visual direction for the gallery.
@@ -94,7 +94,7 @@ import {
   NeuralGalaxy,
   loaders,
   getLoaderById
-} from "@open-loading/react";
+} from "@arthav/open-loading";
 ```
 
 Common loader props:
@@ -131,7 +131,7 @@ Before publishing, keep the `repository`, `homepage`, and `bugs` fields in `pack
 
 Only `packages/core` is intended for npm. The root package stays private because it owns the workspace and gallery.
 
-Publishing as `@open-loading/react` requires npm access to the `@open-loading` scope. If you do not control that scope, update `packages/core/package.json` to a package name you control before publishing.
+Publishing as `@arthav/open-loading` requires npm access to the `@arthav` scope. If you change the npm package name later, update `packages/core/package.json`, README examples, and gallery snippets together.
 
 Dry-run the package before publishing:
 

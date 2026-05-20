@@ -1,11 +1,11 @@
-# @open-loading/react
+# @arthav/open-loading
 
 Composable React loading states with machine-readable metadata for humans and AI coding agents.
 
 ## Install
 
 ```bash
-npm install @open-loading/react
+npm install @arthav/open-loading
 ```
 
 The package expects React and React DOM `18.2.0` or newer in the consuming app.
@@ -13,7 +13,7 @@ The package expects React and React DOM `18.2.0` or newer in the consuming app.
 ## Usage
 
 ```tsx
-import { ThinkingOrbit } from "@open-loading/react";
+import { ThinkingOrbit } from "@arthav/open-loading";
 
 export function PendingState() {
   return (
@@ -41,7 +41,7 @@ import {
   TypingDots,
   getLoaderById,
   loaders
-} from "@open-loading/react";
+} from "@arthav/open-loading";
 ```
 
 Every loader uses the shared `LoaderProps` contract:

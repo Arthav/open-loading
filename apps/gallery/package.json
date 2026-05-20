@@ -11,7 +11,7 @@
     "test:run": "vitest run"
   },
   "dependencies": {
-    "@open-loading/react": "workspace:*",
+    "@arthav/open-loading": "workspace:*",
     "lucide-react": "^0.468.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"

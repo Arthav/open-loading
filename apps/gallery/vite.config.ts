@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      "@open-loading/react": fileURLToPath(
+      "@arthav/open-loading": fileURLToPath(
         new URL("../../packages/core/src/index.ts", import.meta.url)
       )
     }
