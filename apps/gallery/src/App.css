@@ -123,6 +123,10 @@ a {
   gap: 0.75rem;
 }
 
+.topActions.routeActions {
+  justify-content: flex-end;
+}
+
 .searchBox {
   align-items: center;
   background: rgba(255, 255, 255, 0.045);
@@ -995,6 +999,10 @@ a {
     padding-bottom: 0.8rem;
   }
 
+  .topActions.routeActions {
+    justify-content: flex-end;
+  }
+
   .workspace {
     grid-template-columns: 14rem minmax(0, 1fr);
   }
@@ -1045,6 +1053,10 @@ a {
     align-items: stretch;
     display: grid;
     grid-template-columns: 1fr;
+  }
+
+  .topActions.routeActions {
+    justify-content: stretch;
   }
 
   .searchBox {

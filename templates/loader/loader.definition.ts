@@ -14,7 +14,7 @@ export const loaderNameDefinition = {
   supportsError: false,
   motionLevel: "subtle",
   packageName: "@arthav/open-loading",
-  version: "0.1.0",
+  version: "0.1.1",
   framework: "React + TypeScript",
   license: "MIT",
   tags: ["template"],

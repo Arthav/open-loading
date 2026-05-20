@@ -1,4 +1,5 @@
 import type { LoaderDefinition, LoaderPropDefinition } from "../types.js";
+import { packageVersion } from "./package-version.js";
 
 const commonProps: LoaderPropDefinition[] = [
   {
@@ -44,7 +45,7 @@ const commonProps: LoaderPropDefinition[] = [
 
 const base = {
   packageName: "@arthav/open-loading" as const,
-  version: "0.1.0",
+  version: packageVersion,
   framework: "React + TypeScript" as const,
   license: "MIT" as const,
   props: commonProps,

@@ -4,6 +4,8 @@ import {
   getLoadersByCategory,
   loaders
 } from "./index.js";
+import packageJson from "../../package.json" with { type: "json" };
+import { packageVersion } from "./package-version.js";
 
 describe("loader registry", () => {
   it("validates all bundled loader definitions", () => {
@@ -26,6 +28,13 @@ describe("loader registry", () => {
     expect(getLoadersByCategory("waiting-room").map((loader) => loader.id)).toEqual([
       "queue-beacon"
     ]);
+  });
+
+  it("keeps loader metadata versions aligned with package metadata", () => {
+    expect(packageVersion).toBe(packageJson.version);
+    expect(loaders.map((loader) => loader.version)).toEqual(
+      loaders.map(() => packageJson.version)
+    );
   });
 
   it("rejects duplicate ids", () => {

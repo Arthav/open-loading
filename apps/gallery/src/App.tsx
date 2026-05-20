@@ -26,7 +26,13 @@ import {
   UserRound,
   Zap
 } from "lucide-react";
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+  type MouseEvent,
+  type ReactNode
+} from "react";
 import {
   AIStream,
   ErrorRetry,
@@ -172,6 +178,64 @@ const apiExports = [
 
 type InspectorTab = "Details" | "Props" | "Code" | "Schema";
 
+const routePaths = [
+  "/gallery",
+  "/use-cases",
+  "/docs",
+  "/api",
+  "/contribute"
+] as const;
+
+type AppRoute = (typeof routePaths)[number];
+
+const navItems: Array<{ label: string; path: AppRoute }> = [
+  { label: "Gallery", path: "/gallery" },
+  { label: "Use cases", path: "/use-cases" },
+  { label: "Docs", path: "/docs" },
+  { label: "API", path: "/api" },
+  { label: "Contribute", path: "/contribute" }
+];
+
+const hashRouteMap: Record<string, AppRoute> = {
+  api: "/api",
+  contribute: "/contribute",
+  docs: "/docs",
+  gallery: "/gallery",
+  "use-cases": "/use-cases"
+};
+
+function normalizeRoute(pathname: string): AppRoute {
+  const normalizedPath = pathname.replace(/\/+$/, "") || "/";
+
+  if (normalizedPath === "/") {
+    return "/gallery";
+  }
+
+  if (routePaths.includes(normalizedPath as AppRoute)) {
+    return normalizedPath as AppRoute;
+  }
+
+  return "/gallery";
+}
+
+function getCurrentRoute(): AppRoute {
+  const hashRoute = hashRouteMap[window.location.hash.replace("#", "")];
+
+  return hashRoute ?? normalizeRoute(window.location.pathname);
+}
+
+function scrollToPageTop() {
+  if (typeof window.scrollTo !== "function") {
+    return;
+  }
+
+  try {
+    window.scrollTo({ top: 0 });
+  } catch {
+    return;
+  }
+}
+
 function getComponent(definition: LoaderDefinition): LoaderComponent {
   return componentMap[definition.componentName] ?? ThinkingOrbit;
 }
@@ -181,6 +245,9 @@ function getLoadersForUseCase(categoriesForUseCase: LoaderType[]) {
 }
 
 export function App() {
+  const [currentRoute, setCurrentRoute] = useState<AppRoute>(() =>
+    getCurrentRoute()
+  );
   const [selectedCategory, setSelectedCategory] =
     useState<LoaderType>("ai-thinking");
   const [selectedId, setSelectedId] = useState("thinking-orbit");
@@ -194,16 +261,41 @@ export function App() {
   const SelectedComponent = getComponent(selectedLoader);
 
   useEffect(() => {
-    const targetId = window.location.hash.replace("#", "");
+    const initialRoute = getCurrentRoute();
 
-    if (!targetId) {
-      return;
+    if (window.location.hash && initialRoute !== normalizeRoute(window.location.pathname)) {
+      window.history.replaceState(null, "", initialRoute);
     }
 
-    window.requestAnimationFrame(() => {
-      document.getElementById(targetId)?.scrollIntoView({ block: "start" });
-    });
+    function handleLocationChange() {
+      setCurrentRoute(getCurrentRoute());
+    }
+
+    window.addEventListener("popstate", handleLocationChange);
+    window.addEventListener("hashchange", handleLocationChange);
+
+    return () => {
+      window.removeEventListener("popstate", handleLocationChange);
+      window.removeEventListener("hashchange", handleLocationChange);
+    };
   }, []);
+
+  function navigateTo(route: AppRoute) {
+    if (route !== normalizeRoute(window.location.pathname) || window.location.hash) {
+      window.history.pushState(null, "", route);
+    }
+
+    setCurrentRoute(route);
+    scrollToPageTop();
+  }
+
+  function handleRouteClick(
+    event: MouseEvent<HTMLAnchorElement>,
+    route: AppRoute
+  ) {
+    event.preventDefault();
+    navigateTo(route);
+  }
 
   const visibleLoaders = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -256,11 +348,7 @@ export function App() {
       chooseCategory(categoriesForUseCase[0]);
     }
 
-    const gallery = document.getElementById("gallery");
-
-    if (typeof gallery?.scrollIntoView === "function") {
-      gallery.scrollIntoView({ block: "start" });
-    }
+    navigateTo("/gallery");
   }
 
   async function copySnippet(key: string, value: string) {
@@ -275,33 +363,44 @@ export function App() {
   return (
     <div className="app">
       <header className="topbar">
-        <a className="brand" href="#gallery" aria-label="open-loading home">
+        <a
+          className="brand"
+          href="/gallery"
+          onClick={(event) => handleRouteClick(event, "/gallery")}
+          aria-label="open-loading home"
+        >
           <span className="brandMark" aria-hidden="true" />
           <span>open-loading</span>
         </a>
         <nav className="topnav" aria-label="Primary navigation">
-          <a className="active" href="#gallery">
-            Gallery
-          </a>
-          <a href="#use-cases">Use cases</a>
-          <a href="#docs">Docs</a>
-          <a href="#api">API</a>
-          <a href="#contribute">Contribute</a>
+          {navItems.map((item) => (
+            <a
+              aria-current={currentRoute === item.path ? "page" : undefined}
+              className={currentRoute === item.path ? "active" : undefined}
+              href={item.path}
+              key={item.path}
+              onClick={(event) => handleRouteClick(event, item.path)}
+            >
+              {item.label}
+            </a>
+          ))}
           <a href={repositoryUrl} rel="noreferrer" target="_blank">
             GitHub <ExternalLink size={14} strokeWidth={1.8} />
           </a>
         </nav>
-        <div className="topActions">
-          <label className="searchBox">
-            <Search size={17} />
-            <input
-              aria-label="Search loaders"
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search loaders..."
-              value={search}
-            />
-            <kbd>/</kbd>
-          </label>
+        <div className={currentRoute === "/gallery" ? "topActions" : "topActions routeActions"}>
+          {currentRoute === "/gallery" ? (
+            <label className="searchBox">
+              <Search size={17} />
+              <input
+                aria-label="Search loaders"
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Search loaders..."
+                value={search}
+              />
+              <kbd>/</kbd>
+            </label>
+          ) : null}
           <button
             className="repoButton"
             onClick={() => copySnippet("top-install", installSnippet)}
@@ -323,180 +422,209 @@ export function App() {
       </header>
 
       <main className="siteMain">
-        <section className="workspace" id="gallery" aria-label="Loader gallery">
-          <aside className="categoryRail" aria-label="Loader categories">
-            <p className="railLabel">Categories</p>
-            <div className="categoryList">
-              {categories.map((category) => {
-                const Icon = category.icon;
-                const count = getLoadersByCategory(category.id).length;
+        {currentRoute === "/gallery" ? (
+          <>
+            <section className="workspace" aria-label="Loader gallery">
+              <aside className="categoryRail" aria-label="Loader categories">
+                <p className="railLabel">Categories</p>
+                <div className="categoryList">
+                  {categories.map((category) => {
+                    const Icon = category.icon;
+                    const count = getLoadersByCategory(category.id).length;
 
-                return (
-                  <button
-                    className={
-                      category.id === selectedCategory
-                        ? "categoryItem selected"
-                        : "categoryItem"
-                    }
-                    key={category.id}
-                    onClick={() => chooseCategory(category.id)}
-                    type="button"
-                  >
-                    <Icon size={18} />
-                    <span>{category.label}</span>
-                    <small>{count}</small>
-                  </button>
-                );
-              })}
-            </div>
-            <div className="railNote">
-              <p>
-                open-loading is a collection of accessible, composable loading
-                states for React products and AI-agent era interfaces.
-              </p>
-              <span>
-                <Braces size={15} /> Agent-safe schema
-              </span>
-              <span>
-                <Star size={15} /> MIT licensed
-              </span>
-            </div>
-          </aside>
-
-          <section className="stageColumn" aria-label="Selected loader preview">
-            <div className="stageHeader">
-              <div>
-                <a className="backLink" href="#use-cases">
-                  Explore use cases
-                </a>
-                <div className="titleRow">
-                  <h1>{selectedLoader.name}</h1>
-                  <span>{selectedLoader.type}</span>
+                    return (
+                      <button
+                        className={
+                          category.id === selectedCategory
+                            ? "categoryItem selected"
+                            : "categoryItem"
+                        }
+                        key={category.id}
+                        onClick={() => chooseCategory(category.id)}
+                        type="button"
+                      >
+                        <Icon size={18} />
+                        <span>{category.label}</span>
+                        <small>{count}</small>
+                      </button>
+                    );
+                  })}
                 </div>
-                <p>{selectedLoader.agentNotes.addWhen}</p>
-              </div>
-              <div className="stageTools" aria-label="Preview tools">
-                <button
-                  className="iconButton"
-                  onClick={() => setActiveTab("Code")}
-                  type="button"
-                  aria-label="View code"
-                >
-                  <Code2 size={18} />
-                </button>
-                <a className="iconButton" href="#docs" aria-label="Read documentation">
-                  <BookOpen size={18} />
-                </a>
-                <a
-                  className="iconButton"
-                  href={repositoryUrl}
-                  rel="noreferrer"
-                  target="_blank"
-                  aria-label="Open GitHub repository"
-                >
-                  <Github size={18} />
-                </a>
-              </div>
-            </div>
+                <div className="railNote">
+                  <p>
+                    open-loading is a collection of accessible, composable loading
+                    states for React products and AI-agent era interfaces.
+                  </p>
+                  <span>
+                    <Braces size={15} /> Agent-safe schema
+                  </span>
+                  <span>
+                    <Star size={15} /> MIT licensed
+                  </span>
+                </div>
+              </aside>
 
-            <div className="loaderStage">
-              <div className="stageStars" aria-hidden="true" />
-              <SelectedComponent {...previewProps} />
-            </div>
-
-            <div className="controlStrip" aria-label="Preview controls">
-              <label>
-                <input
-                  checked={messageEnabled}
-                  onChange={(event) => setMessageEnabled(event.target.checked)}
-                  type="checkbox"
-                />
-                Message
-              </label>
-              <label>
-                <input
-                  checked={errorEnabled}
-                  disabled={!selectedLoader.supportsError}
-                  onChange={(event) => setErrorEnabled(event.target.checked)}
-                  type="checkbox"
-                />
-                Error mode
-              </label>
-              <span>{selectedLoader.motionLevel} motion</span>
-              <span>{selectedLoader.complexity} complexity</span>
-            </div>
-
-            <div className="variantStrip" aria-label="Loader variants">
-              {visibleLoaders.length > 0 ? (
-                visibleLoaders.map((loader) => {
-                  const Preview = getComponent(loader);
-
-                  return (
-                    <button
-                      className={
-                        loader.id === selectedId
-                          ? "variantCard selected"
-                          : "variantCard"
-                      }
-                      key={loader.id}
-                      onClick={() => chooseLoader(loader)}
-                      type="button"
+              <section className="stageColumn" aria-label="Selected loader preview">
+                <div className="stageHeader">
+                  <div>
+                    <a
+                      className="backLink"
+                      href="/use-cases"
+                      onClick={(event) => handleRouteClick(event, "/use-cases")}
                     >
-                      <span className="miniPreview" aria-hidden="true">
-                        <Preview reducedMotion size="sm" />
-                      </span>
-                      <strong>{loader.name}</strong>
+                      Explore use cases
+                    </a>
+                    <div className="titleRow">
+                      <h1>{selectedLoader.name}</h1>
+                      <span>{selectedLoader.type}</span>
+                    </div>
+                    <p>{selectedLoader.agentNotes.addWhen}</p>
+                  </div>
+                  <div className="stageTools" aria-label="Preview tools">
+                    <button
+                      className="iconButton"
+                      onClick={() => setActiveTab("Code")}
+                      type="button"
+                      aria-label="View code"
+                    >
+                      <Code2 size={18} />
                     </button>
-                  );
-                })
-              ) : (
-                <div className="emptyCategory">
-                  <strong>No loaders in this category yet.</strong>
-                  <span>Agent contributors can add one with the loader template.</span>
+                    <a
+                      className="iconButton"
+                      href="/docs"
+                      onClick={(event) => handleRouteClick(event, "/docs")}
+                      aria-label="Read documentation"
+                    >
+                      <BookOpen size={18} />
+                    </a>
+                    <a
+                      className="iconButton"
+                      href={repositoryUrl}
+                      rel="noreferrer"
+                      target="_blank"
+                      aria-label="Open GitHub repository"
+                    >
+                      <Github size={18} />
+                    </a>
+                  </div>
                 </div>
-              )}
-            </div>
-          </section>
 
-          <aside className="inspector" aria-label="Loader inspector">
-            <div className="tabs" role="tablist" aria-label="Inspector tabs">
-              {(["Details", "Props", "Code", "Schema"] as InspectorTab[]).map(
-                (tab) => (
-                  <button
-                    aria-selected={activeTab === tab}
-                    className={activeTab === tab ? "active" : undefined}
-                    key={tab}
-                    onClick={() => setActiveTab(tab)}
-                    role="tab"
-                    type="button"
-                  >
-                    {tab}
-                  </button>
-                )
-              )}
-            </div>
-            <InspectorContent loader={selectedLoader} tab={activeTab} />
-          </aside>
-        </section>
+                <div className="loaderStage">
+                  <div className="stageStars" aria-hidden="true" />
+                  <SelectedComponent {...previewProps} />
+                </div>
 
-        <footer className="statusDock" aria-label="Library status">
-          <a className="branchPicker" href={`${repositoryUrl}/tree/main`}>
-            main
-          </a>
-          <StatusItem label={`${loaders.length} loaders`} />
-          <StatusItem label="React 18/19" />
-          <StatusItem label="Reduced motion" />
-          <StatusItem label="MIT licensed" />
-          <a className="contributeButton" href="#contribute">
-            <Zap size={18} />
-            Contribute a loader
-          </a>
-        </footer>
+                <div className="controlStrip" aria-label="Preview controls">
+                  <label>
+                    <input
+                      checked={messageEnabled}
+                      onChange={(event) =>
+                        setMessageEnabled(event.target.checked)
+                      }
+                      type="checkbox"
+                    />
+                    Message
+                  </label>
+                  <label>
+                    <input
+                      checked={errorEnabled}
+                      disabled={!selectedLoader.supportsError}
+                      onChange={(event) => setErrorEnabled(event.target.checked)}
+                      type="checkbox"
+                    />
+                    Error mode
+                  </label>
+                  <span>{selectedLoader.motionLevel} motion</span>
+                  <span>{selectedLoader.complexity} complexity</span>
+                </div>
 
-        <UseCasesSection openUseCase={openUseCase} />
-        <DocsSection copiedKey={copiedKey} copySnippet={copySnippet} />
-        <ApiSection copiedKey={copiedKey} copySnippet={copySnippet} />
-        <ContributeSection copiedKey={copiedKey} copySnippet={copySnippet} />
+                <div className="variantStrip" aria-label="Loader variants">
+                  {visibleLoaders.length > 0 ? (
+                    visibleLoaders.map((loader) => {
+                      const Preview = getComponent(loader);
+
+                      return (
+                        <button
+                          className={
+                            loader.id === selectedId
+                              ? "variantCard selected"
+                              : "variantCard"
+                          }
+                          key={loader.id}
+                          onClick={() => chooseLoader(loader)}
+                          type="button"
+                        >
+                          <span className="miniPreview" aria-hidden="true">
+                            <Preview reducedMotion size="sm" />
+                          </span>
+                          <strong>{loader.name}</strong>
+                        </button>
+                      );
+                    })
+                  ) : (
+                    <div className="emptyCategory">
+                      <strong>No loaders in this category yet.</strong>
+                      <span>
+                        Agent contributors can add one with the loader template.
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </section>
+
+              <aside className="inspector" aria-label="Loader inspector">
+                <div className="tabs" role="tablist" aria-label="Inspector tabs">
+                  {(["Details", "Props", "Code", "Schema"] as InspectorTab[]).map(
+                    (tab) => (
+                      <button
+                        aria-selected={activeTab === tab}
+                        className={activeTab === tab ? "active" : undefined}
+                        key={tab}
+                        onClick={() => setActiveTab(tab)}
+                        role="tab"
+                        type="button"
+                      >
+                        {tab}
+                      </button>
+                    )
+                  )}
+                </div>
+                <InspectorContent loader={selectedLoader} tab={activeTab} />
+              </aside>
+            </section>
+
+            <footer className="statusDock" aria-label="Library status">
+              <a className="branchPicker" href={`${repositoryUrl}/tree/main`}>
+                main
+              </a>
+              <StatusItem label={`${loaders.length} loaders`} />
+              <StatusItem label="React 18/19" />
+              <StatusItem label="Reduced motion" />
+              <StatusItem label="MIT licensed" />
+              <a
+                className="contributeButton"
+                href="/contribute"
+                onClick={(event) => handleRouteClick(event, "/contribute")}
+              >
+                <Zap size={18} />
+                Contribute a loader
+              </a>
+            </footer>
+          </>
+        ) : null}
+
+        {currentRoute === "/use-cases" ? (
+          <UseCasesSection openUseCase={openUseCase} />
+        ) : null}
+        {currentRoute === "/docs" ? (
+          <DocsSection copiedKey={copiedKey} copySnippet={copySnippet} />
+        ) : null}
+        {currentRoute === "/api" ? (
+          <ApiSection copiedKey={copiedKey} copySnippet={copySnippet} />
+        ) : null}
+        {currentRoute === "/contribute" ? (
+          <ContributeSection copiedKey={copiedKey} copySnippet={copySnippet} />
+        ) : null}
       </main>
     </div>
   );

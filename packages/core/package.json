@@ -1,6 +1,6 @@
 {
   "name": "@arthav/open-loading",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Composable React loading states with machine-readable metadata for humans and AI agents.",
   "license": "MIT",
   "author": "open-loading contributors",
