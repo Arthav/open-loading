@@ -4,8 +4,10 @@ import { OpenLoadingStyles } from "./styles.js";
 interface LoaderFrameProps extends LoaderProps {
   children: React.ReactNode;
   defaultMessage: string;
-  submessage?: string;
   label?: string;
+  layout?: "stack" | "inline";
+  submessage?: string;
+  supportsError?: boolean;
 }
 
 export function LoaderFrame({
@@ -14,16 +16,18 @@ export function LoaderFrame({
   defaultMessage,
   error,
   label,
+  layout = "stack",
   message,
   reducedMotion,
   size = "md",
   submessage,
+  supportsError = true,
   tone = "brand"
 }: LoaderFrameProps) {
-  const isError = Boolean(error);
+  const isError = supportsError && Boolean(error);
   const live = isError ? "assertive" : "polite";
   const displayMessage =
-    typeof error === "string" ? error : message || defaultMessage;
+    isError && typeof error === "string" ? error : message || defaultMessage;
 
   return (
     <>
@@ -32,6 +36,7 @@ export function LoaderFrame({
         aria-label={label || displayMessage}
         aria-live={live}
         className={["ol-root", className].filter(Boolean).join(" ")}
+        data-layout={layout}
         data-reduced-motion={reducedMotion ? "true" : undefined}
         data-size={size}
         data-tone={isError ? "danger" : tone}

@@ -8,6 +8,7 @@ export function TypingDots(props: LoaderProps) {
       defaultMessage="Composing response..."
       label="Typing dots loading state"
       submessage="Streaming will begin soon"
+      supportsError={false}
     >
       <span className="ol-dots" aria-hidden="true">
         <span className="ol-dot" />

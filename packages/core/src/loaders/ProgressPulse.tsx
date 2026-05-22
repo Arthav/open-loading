@@ -7,7 +7,7 @@ export function ProgressPulse(props: LoaderProps) {
       {...props}
       defaultMessage="Uploading context..."
       label="Progress pulse loading state"
-      submessage="72% complete"
+      submessage="Progress is moving"
     >
       <span className="ol-progress-track" aria-hidden="true">
         <span className="ol-progress-bar" />

@@ -8,6 +8,7 @@ export function SkeletonWave(props: LoaderProps) {
       defaultMessage="Preparing layout..."
       label="Skeleton wave loading state"
       submessage="Content placeholders are visible"
+      supportsError={false}
     >
       <span className="ol-skeleton" aria-hidden="true">
         <span className="ol-skeleton-row" />

@@ -1,0 +1,25 @@
+name: Docs issue
+description: Report inaccurate, missing, or confusing documentation.
+title: "Docs: "
+labels:
+  - docs
+body:
+  - type: input
+    id: page
+    attributes:
+      label: Page or file
+      placeholder: README.md, packages/core/README.md, /docs, /api
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What needs to change?
+      placeholder: The README should mention that production apps can import styles.css once.
+    validations:
+      required: true
+  - type: textarea
+    id: suggested-copy
+    attributes:
+      label: Suggested copy
+      description: Optional, but useful when the correction is precise.

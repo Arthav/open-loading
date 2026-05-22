@@ -108,6 +108,54 @@ export const loaderDefinitions = [
   },
   {
     ...base,
+    id: "button-hold",
+    name: "Button Hold",
+    componentName: "ButtonHold",
+    type: "inline",
+    useCases: ["button pending", "form submit", "toolbar action"],
+    category: "inline",
+    complexity: "low",
+    supportsMessage: true,
+    supportsError: false,
+    motionLevel: "subtle",
+    tags: ["button", "submit", "inline", "compact"],
+    previewMessage: "Saving...",
+    agentNotes: {
+      schemaVersion: "1.0",
+      status: "stable",
+      addWhen:
+        "Use inside submit buttons, toolbar actions, and compact controls where dimensions should stay stable while work is pending.",
+      avoidWhen:
+        "Avoid for page loads, multi-step imports, AI reasoning, or recoverable errors that need more context than a button can hold.",
+      safeToModify: ["message copy", "glyph size", "animation timing", "accent tone"]
+    }
+  },
+  {
+    ...base,
+    id: "route-reveal",
+    name: "Route Reveal",
+    componentName: "RouteReveal",
+    type: "page",
+    useCases: ["route transition", "dashboard initialization", "page shell loading"],
+    category: "page",
+    complexity: "medium",
+    supportsMessage: true,
+    supportsError: true,
+    motionLevel: "subtle",
+    tags: ["page", "route", "dashboard", "shell"],
+    previewMessage: "Preparing page...",
+    agentNotes: {
+      schemaVersion: "1.0",
+      status: "stable",
+      addWhen:
+        "Use when a route, dashboard, or app section needs a spacious loading state before the full page is ready.",
+      avoidWhen:
+        "Avoid inside buttons, table rows, or tiny inline surfaces where a page shell would imply too much scope.",
+      safeToModify: ["shell density", "sweep timing", "message copy", "accent tone"]
+    }
+  },
+  {
+    ...base,
     id: "typing-dots",
     name: "Typing Dots",
     componentName: "TypingDots",
@@ -152,6 +200,30 @@ export const loaderDefinitions = [
   },
   {
     ...base,
+    id: "file-import-stack",
+    name: "File Import Stack",
+    componentName: "FileImportStack",
+    type: "uploading",
+    useCases: ["file import", "row parsing", "data validation"],
+    category: "uploading",
+    complexity: "medium",
+    supportsMessage: true,
+    supportsError: true,
+    motionLevel: "moderate",
+    tags: ["file", "import", "parse", "validate", "upload"],
+    previewMessage: "Importing file...",
+    agentNotes: {
+      schemaVersion: "1.0",
+      status: "stable",
+      addWhen:
+        "Use when a product is parsing, validating, and importing user-provided files or tabular data.",
+      avoidWhen:
+        "Avoid for plain uploads that do not include import semantics, exact determinate progress, or inline button submits.",
+      safeToModify: ["step count", "file shape", "message copy", "validation timing"]
+    }
+  },
+  {
+    ...base,
     id: "skeleton-wave",
     name: "Skeleton Wave",
     componentName: "SkeletonWave",
@@ -170,6 +242,54 @@ export const loaderDefinitions = [
       addWhen: "Use when the final layout shape is more useful than a centered spinner.",
       avoidWhen: "Avoid if the eventual content shape is unknown.",
       safeToModify: ["row count", "row width", "sheen speed"]
+    }
+  },
+  {
+    ...base,
+    id: "data-table-skeleton",
+    name: "Data Table Skeleton",
+    componentName: "DataTableSkeleton",
+    type: "skeleton",
+    useCases: ["data table loading", "admin list", "query results"],
+    category: "skeleton",
+    complexity: "medium",
+    supportsMessage: true,
+    supportsError: false,
+    motionLevel: "subtle",
+    tags: ["table", "rows", "columns", "skeleton", "dashboard"],
+    previewMessage: "Loading rows...",
+    agentNotes: {
+      schemaVersion: "1.0",
+      status: "stable",
+      addWhen:
+        "Use when a data grid, admin list, or query result table is loading and the column structure is already known.",
+      avoidWhen:
+        "Avoid for card feeds, unknown layouts, or empty search results where a table skeleton would misrepresent the incoming content.",
+      safeToModify: ["column count", "row count", "cell density", "sheen speed"]
+    }
+  },
+  {
+    ...base,
+    id: "empty-search",
+    name: "Empty Search",
+    componentName: "EmptySearch",
+    type: "empty",
+    useCases: ["search loading", "filter results", "first-run empty state"],
+    category: "empty",
+    complexity: "low",
+    supportsMessage: true,
+    supportsError: false,
+    motionLevel: "subtle",
+    tags: ["empty", "search", "filters", "results"],
+    previewMessage: "Checking for matches...",
+    agentNotes: {
+      schemaVersion: "1.0",
+      status: "stable",
+      addWhen:
+        "Use while search, filters, or first-run data checks may resolve to an empty result.",
+      avoidWhen:
+        "Avoid when content is definitely loading into a known layout, when a table skeleton is more honest, or when the request has failed.",
+      safeToModify: ["message copy", "row count", "scan timing", "accent tone"]
     }
   },
   {
@@ -196,6 +316,30 @@ export const loaderDefinitions = [
   },
   {
     ...base,
+    id: "tool-call-trace",
+    name: "Tool Call Trace",
+    componentName: "ToolCallTrace",
+    type: "ai-thinking",
+    useCases: ["tool call", "agent action", "function execution"],
+    category: "ai-thinking",
+    complexity: "medium",
+    supportsMessage: true,
+    supportsError: true,
+    motionLevel: "moderate",
+    tags: ["agent", "tools", "function-call", "workflow"],
+    previewMessage: "Calling tools...",
+    agentNotes: {
+      schemaVersion: "1.0",
+      status: "stable",
+      addWhen:
+        "Use when an AI agent is actively calling tools, executing functions, or coordinating external actions.",
+      avoidWhen:
+        "Avoid for plain text generation, idle chat typing, or background jobs where no tool action is actually happening.",
+      safeToModify: ["step count", "line timing", "message copy", "accent tone"]
+    }
+  },
+  {
+    ...base,
     id: "error-retry",
     name: "Error / Retry",
     componentName: "ErrorRetry",
@@ -210,9 +354,9 @@ export const loaderDefinitions = [
     previewMessage: "Request needs attention",
     a11y: {
       ...base.a11y,
-      ariaLive: "assertive" as const,
       notes: [
-        "Root switches to assertive announcements for error copy.",
+        "Root uses polite announcements until an error prop is present.",
+        "Root switches to assertive announcements for error copy when recovering.",
         "Visual warning shape is not the only signal; message text remains required."
       ]
     },

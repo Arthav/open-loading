@@ -35,20 +35,28 @@ import {
 } from "react";
 import {
   AIStream,
+  ButtonHold,
+  DataTableSkeleton,
+  EmptySearch,
   ErrorRetry,
+  FileImportStack,
   getLoaderById,
   getLoadersByCategory,
   loaders,
   NeuralGalaxy,
   ProgressPulse,
   QueueBeacon,
+  RouteReveal,
   SimpleSpinner,
   SkeletonWave,
   ThinkingOrbit,
+  ToolCallTrace,
   TypingDots,
   type LoaderComponent,
   type LoaderDefinition,
   type LoaderProps,
+  type LoaderSize,
+  type LoaderTone,
   type LoaderType
 } from "@arthav/open-loading";
 
@@ -77,13 +85,19 @@ pnpm check`;
 
 const componentMap: Record<string, LoaderComponent> = {
   AIStream,
+  ButtonHold,
+  DataTableSkeleton,
+  EmptySearch,
   ErrorRetry,
+  FileImportStack,
   NeuralGalaxy,
   ProgressPulse,
   QueueBeacon,
+  RouteReveal,
   SimpleSpinner,
   SkeletonWave,
   ThinkingOrbit,
+  ToolCallTrace,
   TypingDots
 };
 
@@ -124,11 +138,25 @@ const useCaseGroups: Array<{
       "Use inside buttons, compact panels, and local fetches where the UI should stay lightweight."
   },
   {
+    title: "Route and page initialization",
+    categories: ["page"],
+    icon: LayoutDashboard,
+    summary:
+      "Use for full-page route transitions, dashboard bootstraps, and section-level loading shells."
+  },
+  {
     title: "Content placeholders",
     categories: ["skeleton"],
     icon: PackageCheck,
     summary:
       "Use when the final layout shape matters more than a centered spinner."
+  },
+  {
+    title: "Search and empty handoff",
+    categories: ["empty"],
+    icon: Box,
+    summary:
+      "Use when search, filters, or first-run checks may legitimately resolve to no content."
   },
   {
     title: "Uploads and imports",
@@ -163,11 +191,17 @@ const useCaseGroups: Array<{
 const apiExports = [
   "ThinkingOrbit",
   "SimpleSpinner",
+  "ButtonHold",
   "TypingDots",
   "ProgressPulse",
+  "FileImportStack",
+  "RouteReveal",
   "QueueBeacon",
+  "DataTableSkeleton",
   "SkeletonWave",
+  "EmptySearch",
   "AIStream",
+  "ToolCallTrace",
   "ErrorRetry",
   "NeuralGalaxy",
   "OpenLoadingStyles",
@@ -178,6 +212,16 @@ const apiExports = [
 
 type InspectorTab = "Details" | "Props" | "Code" | "Schema";
 
+type PreviewConfig = {
+  className: string;
+  errorEnabled: boolean;
+  errorMessage: string;
+  message: string;
+  reducedMotion: boolean;
+  size: LoaderSize;
+  tone: LoaderTone;
+};
+
 const routePaths = [
   "/gallery",
   "/use-cases",
@@ -187,6 +231,12 @@ const routePaths = [
 ] as const;
 
 type AppRoute = (typeof routePaths)[number];
+type GalleryLoaderRoute = `/gallery/${string}`;
+type RouteTarget = AppRoute | GalleryLoaderRoute;
+type RouteSnapshot = {
+  route: AppRoute;
+  loaderId?: string;
+};
 
 const navItems: Array<{ label: string; path: AppRoute }> = [
   { label: "Gallery", path: "/gallery" },
@@ -204,24 +254,138 @@ const hashRouteMap: Record<string, AppRoute> = {
   "use-cases": "/use-cases"
 };
 
-function normalizeRoute(pathname: string): AppRoute {
+const sizeOptions: LoaderSize[] = ["sm", "md", "lg"];
+const toneOptions: LoaderTone[] = [
+  "neutral",
+  "brand",
+  "success",
+  "warning",
+  "danger"
+];
+
+const toneLabels: Record<LoaderTone, string> = {
+  brand: "Brand",
+  danger: "Danger",
+  neutral: "Neutral",
+  success: "Success",
+  warning: "Warning"
+};
+
+const toneSwatches: Record<LoaderTone, string> = {
+  brand: "#ffb22e",
+  danger: "#ff5c5c",
+  neutral: "#d8dee6",
+  success: "#64e083",
+  warning: "#ffb22e"
+};
+
+function getDefaultPreviewConfig(loader: LoaderDefinition): PreviewConfig {
+  return {
+    className: "",
+    errorEnabled: false,
+    errorMessage: "Retry path armed",
+    message: loader.previewMessage,
+    reducedMotion: false,
+    size: "lg",
+    tone: loader.type === "error" ? "danger" : "brand"
+  };
+}
+
+function formatJsString(value: string) {
+  return JSON.stringify(value);
+}
+
+function buildCodeSnippet(
+  loader: LoaderDefinition,
+  previewConfig: PreviewConfig
+) {
+  const lines = [
+    `      message={${formatJsString(previewConfig.message || loader.previewMessage)}}`,
+    `      size="${previewConfig.size}"`,
+    `      tone="${previewConfig.tone}"`
+  ];
+
+  if (previewConfig.errorEnabled && loader.supportsError) {
+    lines.push(
+      `      error={${formatJsString(previewConfig.errorMessage || "Retry path armed")}}`
+    );
+  }
+
+  if (previewConfig.reducedMotion) {
+    lines.push("      reducedMotion");
+  }
+
+  if (previewConfig.className.trim()) {
+    lines.push(`      className="${previewConfig.className.trim()}"`);
+  }
+
+  return `import { ${loader.componentName} } from "${packageName}";
+
+export function PendingState() {
+  return (
+    <${loader.componentName}
+${lines.join("\n")}
+    />
+  );
+}`;
+}
+
+function getLoaderRoute(loader: LoaderDefinition): GalleryLoaderRoute {
+  return `/gallery/${loader.id}`;
+}
+
+function getRouteSnapshot(
+  pathname = window.location.pathname,
+  hash = window.location.hash
+): RouteSnapshot {
+  const hashRoute = hashRouteMap[hash.replace("#", "")];
+
+  if (hashRoute) {
+    return { route: hashRoute };
+  }
+
   const normalizedPath = pathname.replace(/\/+$/, "") || "/";
 
   if (normalizedPath === "/") {
-    return "/gallery";
+    return { route: "/gallery" };
+  }
+
+  const galleryMatch = normalizedPath.match(/^\/gallery\/([^/]+)$/);
+
+  if (galleryMatch) {
+    const loader = getLoaderById(galleryMatch[1]);
+
+    return {
+      route: "/gallery",
+      loaderId: loader?.id
+    };
   }
 
   if (routePaths.includes(normalizedPath as AppRoute)) {
-    return normalizedPath as AppRoute;
+    return { route: normalizedPath as AppRoute };
   }
 
-  return "/gallery";
+  return { route: "/gallery" };
+}
+
+function normalizeRoute(pathname: string): AppRoute {
+  return getRouteSnapshot(pathname, "").route;
 }
 
 function getCurrentRoute(): AppRoute {
-  const hashRoute = hashRouteMap[window.location.hash.replace("#", "")];
+  return getRouteSnapshot().route;
+}
 
-  return hashRoute ?? normalizeRoute(window.location.pathname);
+function getCurrentLoaderId() {
+  return getRouteSnapshot().loaderId ?? "thinking-orbit";
+}
+
+function getInitialLoader() {
+  return getLoaderById(getCurrentLoaderId()) ?? loaders[0];
+}
+
+function getAppRouteFromTarget(route: RouteTarget): AppRoute {
+  return route.startsWith("/gallery/") ? "/gallery" : (route as AppRoute);
 }
 
 function scrollToPageTop() {
@@ -245,30 +409,47 @@ function getLoadersForUseCase(categoriesForUseCase: LoaderType[]) {
 }
 
 export function App() {
+  const initialLoader = getInitialLoader();
   const [currentRoute, setCurrentRoute] = useState<AppRoute>(() =>
     getCurrentRoute()
   );
-  const [selectedCategory, setSelectedCategory] =
-    useState<LoaderType>("ai-thinking");
-  const [selectedId, setSelectedId] = useState("thinking-orbit");
+  const [selectedCategory, setSelectedCategory] = useState<LoaderType>(
+    initialLoader.category
+  );
+  const [selectedId, setSelectedId] = useState(initialLoader.id);
   const [activeTab, setActiveTab] = useState<InspectorTab>("Details");
   const [search, setSearch] = useState("");
-  const [messageEnabled, setMessageEnabled] = useState(true);
-  const [errorEnabled, setErrorEnabled] = useState(false);
+  const [previewConfig, setPreviewConfig] = useState<PreviewConfig>(() =>
+    getDefaultPreviewConfig(getLoaderById("thinking-orbit") ?? loaders[0])
+  );
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
   const selectedLoader = getLoaderById(selectedId) ?? loaders[0];
   const SelectedComponent = getComponent(selectedLoader);
 
   useEffect(() => {
-    const initialRoute = getCurrentRoute();
+    const initialSnapshot = getRouteSnapshot();
 
-    if (window.location.hash && initialRoute !== normalizeRoute(window.location.pathname)) {
-      window.history.replaceState(null, "", initialRoute);
+    if (
+      window.location.hash &&
+      initialSnapshot.route !== normalizeRoute(window.location.pathname)
+    ) {
+      window.history.replaceState(null, "", initialSnapshot.route);
     }
 
     function handleLocationChange() {
-      setCurrentRoute(getCurrentRoute());
+      const snapshot = getRouteSnapshot();
+
+      setCurrentRoute(snapshot.route);
+
+      if (snapshot.loaderId) {
+        const loader = getLoaderById(snapshot.loaderId);
+
+        if (loader) {
+          setSelectedCategory(loader.category);
+          setSelectedId(loader.id);
+        }
+      }
     }
 
     window.addEventListener("popstate", handleLocationChange);
@@ -280,18 +461,24 @@ export function App() {
     };
   }, []);
 
-  function navigateTo(route: AppRoute) {
-    if (route !== normalizeRoute(window.location.pathname) || window.location.hash) {
+  useEffect(() => {
+    setPreviewConfig(getDefaultPreviewConfig(selectedLoader));
+  }, [selectedLoader.id]);
+
+  function navigateTo(route: RouteTarget) {
+    const appRoute = getAppRouteFromTarget(route);
+
+    if (route !== window.location.pathname || window.location.hash) {
       window.history.pushState(null, "", route);
     }
 
-    setCurrentRoute(route);
+    setCurrentRoute(appRoute);
     scrollToPageTop();
   }
 
   function handleRouteClick(
     event: MouseEvent<HTMLAnchorElement>,
-    route: AppRoute
+    route: RouteTarget
   ) {
     event.preventDefault();
     navigateTo(route);
@@ -314,19 +501,30 @@ export function App() {
   }, [search, selectedCategory]);
 
   const previewProps: LoaderProps = {
-    message: messageEnabled ? selectedLoader.previewMessage : undefined,
+    className: previewConfig.className.trim() || undefined,
     error:
-      errorEnabled && selectedLoader.supportsError
-        ? "Retry path armed"
+      previewConfig.errorEnabled && selectedLoader.supportsError
+        ? previewConfig.errorMessage || true
         : false,
-    size: "lg",
-    tone: selectedLoader.type === "error" ? "danger" : "brand"
+    message:
+      selectedLoader.supportsMessage && previewConfig.message.trim()
+        ? previewConfig.message
+        : undefined,
+    reducedMotion: previewConfig.reducedMotion,
+    size: previewConfig.size,
+    tone: previewConfig.tone
   };
 
-  function chooseLoader(loader: LoaderDefinition) {
+  function chooseLoader(
+    loader: LoaderDefinition,
+    syncRoute = currentRoute === "/gallery"
+  ) {
     setSelectedCategory(loader.category);
     setSelectedId(loader.id);
-    setErrorEnabled(false);
+
+    if (syncRoute) {
+      navigateTo(getLoaderRoute(loader));
+    }
   }
 
   function chooseCategory(category: LoaderType) {
@@ -335,20 +533,30 @@ export function App() {
 
     if (first) {
       setSelectedId(first.id);
-      setErrorEnabled(false);
+
+      if (currentRoute === "/gallery") {
+        navigateTo(getLoaderRoute(first));
+      }
     }
+  }
+
+  function updatePreviewConfig(update: Partial<PreviewConfig>) {
+    setPreviewConfig((currentConfig) => ({
+      ...currentConfig,
+      ...update
+    }));
   }
 
   function openUseCase(categoriesForUseCase: LoaderType[]) {
     const first = getLoadersForUseCase(categoriesForUseCase)[0];
 
     if (first) {
-      chooseLoader(first);
+      chooseLoader(first, false);
+      navigateTo(getLoaderRoute(first));
     } else {
       chooseCategory(categoriesForUseCase[0]);
+      navigateTo("/gallery");
     }
-
-    navigateTo("/gallery");
   }
 
   async function copySnippet(key: string, value: string) {
@@ -361,7 +569,7 @@ export function App() {
   }
 
   return (
-    <div className="app">
+    <div className={currentRoute === "/gallery" ? "app galleryApp" : "app"}>
       <header className="topbar">
         <a
           className="brand"
@@ -478,6 +686,15 @@ export function App() {
                       <h1>{selectedLoader.name}</h1>
                       <span>{selectedLoader.type}</span>
                     </div>
+                    <a
+                      className="loaderPermalink"
+                      href={getLoaderRoute(selectedLoader)}
+                      onClick={(event) =>
+                        handleRouteClick(event, getLoaderRoute(selectedLoader))
+                      }
+                    >
+                      {getLoaderRoute(selectedLoader)}
+                    </a>
                     <p>{selectedLoader.agentNotes.addWhen}</p>
                   </div>
                   <div className="stageTools" aria-label="Preview tools">
@@ -514,29 +731,14 @@ export function App() {
                   <SelectedComponent {...previewProps} />
                 </div>
 
-                <div className="controlStrip" aria-label="Preview controls">
-                  <label>
-                    <input
-                      checked={messageEnabled}
-                      onChange={(event) =>
-                        setMessageEnabled(event.target.checked)
-                      }
-                      type="checkbox"
-                    />
-                    Message
-                  </label>
-                  <label>
-                    <input
-                      checked={errorEnabled}
-                      disabled={!selectedLoader.supportsError}
-                      onChange={(event) => setErrorEnabled(event.target.checked)}
-                      type="checkbox"
-                    />
-                    Error mode
-                  </label>
-                  <span>{selectedLoader.motionLevel} motion</span>
-                  <span>{selectedLoader.complexity} complexity</span>
-                </div>
+                <PreviewControls
+                  loader={selectedLoader}
+                  previewConfig={previewConfig}
+                  resetPreview={() =>
+                    setPreviewConfig(getDefaultPreviewConfig(selectedLoader))
+                  }
+                  updatePreviewConfig={updatePreviewConfig}
+                />
 
                 <div className="variantStrip" aria-label="Loader variants">
                   {visibleLoaders.length > 0 ? (
@@ -544,21 +746,24 @@ export function App() {
                       const Preview = getComponent(loader);
 
                       return (
-                        <button
+                        <a
                           className={
                             loader.id === selectedId
                               ? "variantCard selected"
                               : "variantCard"
                           }
+                          href={getLoaderRoute(loader)}
                           key={loader.id}
-                          onClick={() => chooseLoader(loader)}
-                          type="button"
+                          onClick={(event) => {
+                            event.preventDefault();
+                            chooseLoader(loader);
+                          }}
                         >
                           <span className="miniPreview" aria-hidden="true">
                             <Preview reducedMotion size="sm" />
                           </span>
                           <strong>{loader.name}</strong>
-                        </button>
+                        </a>
                       );
                     })
                   ) : (
@@ -589,7 +794,11 @@ export function App() {
                     )
                   )}
                 </div>
-                <InspectorContent loader={selectedLoader} tab={activeTab} />
+                <InspectorContent
+                  loader={selectedLoader}
+                  previewConfig={previewConfig}
+                  tab={activeTab}
+                />
               </aside>
             </section>
 
@@ -627,6 +836,237 @@ export function App() {
         ) : null}
       </main>
     </div>
+  );
+}
+
+function PreviewControls({
+  loader,
+  previewConfig,
+  resetPreview,
+  updatePreviewConfig
+}: {
+  loader: LoaderDefinition;
+  previewConfig: PreviewConfig;
+  resetPreview: () => void;
+  updatePreviewConfig: (update: Partial<PreviewConfig>) => void;
+}) {
+  return (
+    <section className="controlPanel" aria-label="Preview controls">
+      <div className="controlPanelHeader">
+        <div>
+          <span>Live props</span>
+          <strong>{loader.props.length} configurable parameters</strong>
+        </div>
+        <button className="resetButton" onClick={resetPreview} type="button">
+          Reset
+        </button>
+      </div>
+
+      <div className="controlGrid">
+        {loader.props.map((prop) => {
+          if (prop.name === "message") {
+            return (
+              <label
+                className={
+                  loader.supportsMessage
+                    ? "controlField"
+                    : "controlField disabled"
+                }
+                key={prop.name}
+              >
+                <ControlLabel propName={prop.name} type={prop.type} />
+                <input
+                  aria-label="Message"
+                  disabled={!loader.supportsMessage}
+                  onChange={(event) =>
+                    updatePreviewConfig({ message: event.target.value })
+                  }
+                  placeholder={loader.previewMessage}
+                  type="text"
+                  value={previewConfig.message}
+                />
+                <span>
+                  {loader.supportsMessage
+                    ? prop.description
+                    : "This loader does not render message copy."}
+                </span>
+              </label>
+            );
+          }
+
+          if (prop.name === "error") {
+            return (
+              <div
+                className={
+                  loader.supportsError
+                    ? "controlField"
+                    : "controlField disabled"
+                }
+                key={prop.name}
+              >
+                <ControlLabel propName={prop.name} type={prop.type} />
+                <label className="inlineToggle">
+                  <input
+                    aria-label="Enable error mode"
+                    checked={previewConfig.errorEnabled && loader.supportsError}
+                    disabled={!loader.supportsError}
+                    onChange={(event) =>
+                      updatePreviewConfig({
+                        errorEnabled: event.target.checked
+                      })
+                    }
+                    type="checkbox"
+                  />
+                  <span>Error mode</span>
+                </label>
+                <input
+                  aria-label="Error message"
+                  disabled={!loader.supportsError || !previewConfig.errorEnabled}
+                  onChange={(event) =>
+                    updatePreviewConfig({ errorMessage: event.target.value })
+                  }
+                  placeholder="Retry path armed"
+                  type="text"
+                  value={previewConfig.errorMessage}
+                />
+                <span>
+                  {loader.supportsError
+                    ? prop.description
+                    : "This loader does not expose an error state."}
+                </span>
+              </div>
+            );
+          }
+
+          if (prop.name === "size") {
+            return (
+              <fieldset className="controlField" key={prop.name}>
+                <ControlLabel propName={prop.name} type={prop.type} />
+                <div className="segmentedControl" role="radiogroup">
+                  {sizeOptions.map((size) => (
+                    <label
+                      className={
+                        previewConfig.size === size
+                          ? "segmentOption selected"
+                          : "segmentOption"
+                      }
+                      key={size}
+                    >
+                      <input
+                        checked={previewConfig.size === size}
+                        name="preview-size"
+                        onChange={() => updatePreviewConfig({ size })}
+                        type="radio"
+                        value={size}
+                      />
+                      <span>{size.toUpperCase()}</span>
+                    </label>
+                  ))}
+                </div>
+                <span>{prop.description}</span>
+              </fieldset>
+            );
+          }
+
+          if (prop.name === "tone") {
+            return (
+              <fieldset className="controlField toneField" key={prop.name}>
+                <ControlLabel propName={prop.name} type={prop.type} />
+                <div className="toneGrid" role="radiogroup">
+                  {toneOptions.map((tone) => (
+                    <label
+                      className={
+                        previewConfig.tone === tone
+                          ? "toneOption selected"
+                          : "toneOption"
+                      }
+                      key={tone}
+                    >
+                      <input
+                        checked={previewConfig.tone === tone}
+                        name="preview-tone"
+                        onChange={() => updatePreviewConfig({ tone })}
+                        type="radio"
+                        value={tone}
+                      />
+                      <span
+                        aria-hidden="true"
+                        className="toneSwatch"
+                        style={{ backgroundColor: toneSwatches[tone] }}
+                      />
+                      <span>{toneLabels[tone]}</span>
+                    </label>
+                  ))}
+                </div>
+                <span>{prop.description}</span>
+              </fieldset>
+            );
+          }
+
+          if (prop.name === "reducedMotion") {
+            return (
+              <div className="controlField" key={prop.name}>
+                <ControlLabel propName={prop.name} type={prop.type} />
+                <label className="inlineToggle">
+                  <input
+                    aria-label="Reduced motion"
+                    checked={previewConfig.reducedMotion}
+                    onChange={(event) =>
+                      updatePreviewConfig({
+                        reducedMotion: event.target.checked
+                      })
+                    }
+                    type="checkbox"
+                  />
+                  <span>Disable custom animation</span>
+                </label>
+                <span>{prop.description}</span>
+              </div>
+            );
+          }
+
+          if (prop.name === "className") {
+            return (
+              <label className="controlField" key={prop.name}>
+                <ControlLabel propName={prop.name} type={prop.type} />
+                <input
+                  aria-label="Class name"
+                  onChange={(event) =>
+                    updatePreviewConfig({ className: event.target.value })
+                  }
+                  placeholder="custom-loader-hook"
+                  type="text"
+                  value={previewConfig.className}
+                />
+                <span>{prop.description}</span>
+              </label>
+            );
+          }
+
+          return (
+            <div className="controlField disabled" key={prop.name}>
+              <ControlLabel propName={prop.name} type={prop.type} />
+              <span>No gallery editor is available for this prop yet.</span>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+function ControlLabel({
+  propName,
+  type
+}: {
+  propName: string;
+  type: string;
+}) {
+  return (
+    <span className="controlLabel">
+      <code>{propName}</code>
+      <small>{type}</small>
+    </span>
   );
 }
 
@@ -934,9 +1374,11 @@ function CopyButton({
 
 function InspectorContent({
   loader,
+  previewConfig,
   tab
 }: {
   loader: LoaderDefinition;
+  previewConfig: PreviewConfig;
   tab: InspectorTab;
 }) {
   if (tab === "Props") {
@@ -960,19 +1402,7 @@ function InspectorContent({
     return (
       <div className="inspectorBody">
         <PanelHeader loader={loader} />
-        <CodeBlock
-          code={`import { ${loader.componentName} } from "${packageName}";
-
-export function PendingState() {
-  return (
-    <${loader.componentName}
-      message="${loader.previewMessage}"
-      size="lg"
-      tone="brand"
-    />
-  );
-}`}
-        />
+        <CodeBlock code={buildCodeSnippet(loader, previewConfig)} />
       </div>
     );
   }

@@ -28,6 +28,16 @@ export function PendingState() {
 }
 ```
 
+## Styling
+
+Loaders include a zero-config client-side style fallback, but production apps should import the stylesheet once at the app entry when possible:
+
+```tsx
+import "@arthav/open-loading/styles.css";
+```
+
+The stylesheet uses namespaced `ol-` classes and CSS variables. The automatic fallback injects those styles once on the client so quick prototypes still work without extra setup.
+
 ## Quickstart
 
 ```bash
@@ -43,10 +53,32 @@ pnpm build:gallery
 
 Then serve `apps/gallery/dist` with any static server.
 
+## Gallery Routes
+
+The gallery is routeable so docs, issues, and release notes can link to specific surfaces:
+
+- `/gallery` opens the default picker.
+- `/gallery/thinking-orbit` opens a specific loader.
+- `/use-cases`, `/docs`, `/api`, and `/contribute` open the supporting product pages.
+
+## Decision Guide
+
+Use [docs/loader-decision-guide.md](docs/loader-decision-guide.md) to choose loaders by product promise instead of animation taste. It also documents when not to use each category, which matters because a misleading loader is worse than a plain spinner.
+
+For gallery and visual changes, use [docs/visual-qa-checklist.md](docs/visual-qa-checklist.md) before release.
+
+## Examples
+
+Consumer examples live outside the workspace so they behave like real app installs:
+
+- `examples/vite-react` shows direct component usage in a Vite React app.
+- `examples/next-app-router` shows App Router usage with the stylesheet imported in `app/layout.tsx` and loaders rendered from a client component.
+
 ## Project Shape
 
 - `packages/core` contains the React loader package published as `@arthav/open-loading`.
 - `apps/gallery` contains the cinematic docs/gallery app.
+- `examples` contains minimal consumer apps for adoption proof.
 - `templates/loader` contains the required starting point for new loader contributions.
 - `docs/concepts/open-loading-cinematic.png` is the approved visual direction for the gallery.
 
@@ -85,15 +117,23 @@ pnpm check
 import {
   ThinkingOrbit,
   SimpleSpinner,
+  ButtonHold,
   TypingDots,
   ProgressPulse,
+  FileImportStack,
+  RouteReveal,
   QueueBeacon,
+  DataTableSkeleton,
   SkeletonWave,
+  EmptySearch,
   AIStream,
+  ToolCallTrace,
   ErrorRetry,
   NeuralGalaxy,
+  OpenLoadingStyles,
   loaders,
-  getLoaderById
+  getLoaderById,
+  getLoadersByCategory
 } from "@arthav/open-loading";
 ```
 
@@ -138,7 +178,10 @@ Dry-run the package before publishing:
 ```bash
 pnpm check
 pnpm pack:core
+pnpm smoke:core-tarball
 ```
+
+See [docs/release-process.md](docs/release-process.md) for the complete release checklist and [docs/releases/0.1.1.md](docs/releases/0.1.1.md) for the current draft release notes.
 
 When the dry-run looks right, publish from the package directory:
 

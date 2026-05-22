@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   check:
-    name: Validate, test, and build
+    name: Validate, package, and smoke
     runs-on: ubuntu-latest
 
     steps:
@@ -36,3 +36,9 @@ jobs:
 
       - name: Run project checks
         run: pnpm check
+
+      - name: Verify core package contents
+        run: pnpm pack:core
+
+      - name: Smoke test packed package
+        run: pnpm smoke:core-tarball

@@ -37,6 +37,8 @@ Add MatrixCascade loader
 
 Include screenshots or a short recording for new visual behavior when practical.
 
+Use `docs/loader-decision-guide.md` when proposing a loader category, and run through `docs/visual-qa-checklist.md` for gallery or visual changes.
+
 Before opening a PR, verify:
 
 ```bash
@@ -49,6 +51,15 @@ For package-facing changes, also run:
 ```bash
 pnpm pack:core
 ```
+
+## Issue Templates
+
+Use the GitHub issue forms to keep work scoped:
+
+- Loader requests must describe the use case, expected wait duration, error support, progress needs, and real product examples.
+- Accessibility issues should include the affected loader or route, assistive technology details when available, and reproduction steps.
+- Bug reports should include the package version, environment, expected behavior, and actual behavior.
+- Docs issues should point to the page or file that needs correction.
 
 ## Repository Boundaries
 

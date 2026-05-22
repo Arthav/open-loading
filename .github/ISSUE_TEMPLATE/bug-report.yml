@@ -1,0 +1,50 @@
+name: Bug report
+description: Report a broken loader, registry entry, gallery route, or package behavior.
+title: "Bug: "
+labels:
+  - bug
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      placeholder: The SimpleSpinner preview route renders the wrong loader after browser back.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Package version
+      placeholder: 0.1.1
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      placeholder: Vite + React 19, Next.js App Router, gallery route, npm tarball.
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction steps
+      placeholder: |
+        1. Open /gallery/queue-beacon.
+        2. Click Typing Dots.
+        3. Press browser back.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or screenshots
+      render: shell

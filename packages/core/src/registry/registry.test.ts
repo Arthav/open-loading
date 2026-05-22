@@ -20,8 +20,43 @@ describe("loader registry", () => {
     const aiLoaders = getLoadersByCategory("ai-thinking");
 
     expect(aiLoaders.map((loader) => loader.id)).toEqual(
-      expect.arrayContaining(["thinking-orbit", "typing-dots", "ai-stream"])
+      expect.arrayContaining([
+        "thinking-orbit",
+        "typing-dots",
+        "ai-stream",
+        "tool-call-trace"
+      ])
     );
+  });
+
+  it("includes compact action loaders in inline category", () => {
+    expect(getLoadersByCategory("inline").map((loader) => loader.id)).toEqual(
+      expect.arrayContaining(["simple-spinner", "button-hold"])
+    );
+  });
+
+  it("includes a page-level route loader", () => {
+    expect(getLoadersByCategory("page").map((loader) => loader.id)).toEqual([
+      "route-reveal"
+    ]);
+  });
+
+  it("includes table-specific loaders in skeleton category", () => {
+    expect(getLoadersByCategory("skeleton").map((loader) => loader.id)).toEqual(
+      expect.arrayContaining(["skeleton-wave", "data-table-skeleton"])
+    );
+  });
+
+  it("includes file import loaders in uploading category", () => {
+    expect(getLoadersByCategory("uploading").map((loader) => loader.id)).toEqual(
+      expect.arrayContaining(["progress-pulse", "file-import-stack"])
+    );
+  });
+
+  it("includes a search-to-empty loader in empty category", () => {
+    expect(getLoadersByCategory("empty").map((loader) => loader.id)).toEqual([
+      "empty-search"
+    ]);
   });
 
   it("includes a waiting-room loader", () => {

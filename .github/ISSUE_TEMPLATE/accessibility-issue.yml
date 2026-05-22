@@ -1,0 +1,46 @@
+name: Accessibility issue
+description: Report an accessibility, reduced-motion, or announcement problem.
+title: "A11y: "
+labels:
+  - a11y
+body:
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected area
+      options:
+        - Loader component
+        - Gallery
+        - Documentation
+        - Metadata
+    validations:
+      required: true
+  - type: input
+    id: loader
+    attributes:
+      label: Loader id or route
+      placeholder: thinking-orbit or /gallery/thinking-orbit
+  - type: textarea
+    id: problem
+    attributes:
+      label: What is the accessibility problem?
+      placeholder: The error state is announced politely instead of assertively.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      placeholder: Error copy should be assertive only while an error is present.
+    validations:
+      required: true
+  - type: textarea
+    id: assistive-tech
+    attributes:
+      label: Assistive technology or browser details
+      placeholder: VoiceOver + Safari, NVDA + Firefox, prefers-reduced-motion enabled.
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction steps
+      placeholder: Open /gallery/error-retry, enable error mode, listen to the live region.

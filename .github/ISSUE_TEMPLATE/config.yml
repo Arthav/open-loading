@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions and discussions
+    url: https://github.com/Arthav/open-loading/discussions
+    about: Use discussions for ideas that are not ready to become scoped issues.

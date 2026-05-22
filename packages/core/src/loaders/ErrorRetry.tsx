@@ -5,7 +5,7 @@ export function ErrorRetry(props: LoaderProps) {
   return (
     <LoaderFrame
       {...props}
-      defaultMessage="Retrying safely..."
+      defaultMessage="Request needs attention"
       label="Error retry loading state"
       submessage="Fallback path is ready"
     >

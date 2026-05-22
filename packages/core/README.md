@@ -31,15 +31,23 @@ export function PendingState() {
 ```tsx
 import {
   AIStream,
+  ButtonHold,
+  DataTableSkeleton,
+  EmptySearch,
   ErrorRetry,
+  FileImportStack,
   NeuralGalaxy,
+  OpenLoadingStyles,
   ProgressPulse,
   QueueBeacon,
+  RouteReveal,
   SimpleSpinner,
   SkeletonWave,
   ThinkingOrbit,
+  ToolCallTrace,
   TypingDots,
   getLoaderById,
+  getLoadersByCategory,
   loaders
 } from "@arthav/open-loading";
 ```
@@ -56,6 +64,20 @@ type LoaderProps = {
   className?: string;
 };
 ```
+
+## Styling
+
+For production apps, import the package stylesheet once near your app root:
+
+```tsx
+import "@arthav/open-loading/styles.css";
+```
+
+Loaders also include a client-side singleton style fallback for zero-config usage. The explicit stylesheet import is better for SSR and avoids relying on runtime style injection. All component styles use namespaced `ol-` classes and CSS variables.
+
+## Framework Notes
+
+Vite apps can import the stylesheet in `src/main.tsx`. Next.js App Router apps can import it in `app/layout.tsx`, then render loader components from a client component. See the root `examples/vite-react` and `examples/next-app-router` folders for complete minimal apps.
 
 ## Registry
 

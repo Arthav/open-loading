@@ -25,6 +25,7 @@
     "test:run": "pnpm -r test:run",
     "validate": "pnpm --filter @arthav/open-loading validate:metadata",
     "pack:core": "pnpm --filter @arthav/open-loading exec npm pack --dry-run",
+    "smoke:core-tarball": "node packages/core/scripts/smoke-tarball-consumer.mjs",
     "check": "pnpm validate && pnpm typecheck && pnpm test:run && pnpm build"
   },
   "devDependencies": {

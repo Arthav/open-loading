@@ -1,0 +1,77 @@
+name: Loader request
+description: Propose one concrete loading state for the catalog.
+title: "Loader request: "
+labels:
+  - loader request
+body:
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Product use case
+      description: Describe the real product wait state this loader should handle.
+      placeholder: A user submits a file import and waits while rows are parsed, validated, and saved.
+    validations:
+      required: true
+  - type: dropdown
+    id: expected-duration
+    attributes:
+      label: Expected wait duration
+      options:
+        - Under 1 second
+        - 1-5 seconds
+        - 5-30 seconds
+        - Over 30 seconds
+        - Unknown or variable
+    validations:
+      required: true
+  - type: dropdown
+    id: category
+    attributes:
+      label: Best-fit category
+      options:
+        - inline
+        - page
+        - skeleton
+        - ai-thinking
+        - uploading
+        - error
+        - empty
+        - waiting-room
+        - experimental
+    validations:
+      required: true
+  - type: dropdown
+    id: error-support
+    attributes:
+      label: Does it need an error state?
+      options:
+        - "No"
+        - "Yes"
+        - Not sure
+    validations:
+      required: true
+  - type: dropdown
+    id: progress-support
+    attributes:
+      label: Does it need real progress?
+      description: Only choose yes when the consuming app can pass actual progress.
+      options:
+        - "No"
+        - "Yes"
+        - Not sure
+    validations:
+      required: true
+  - type: textarea
+    id: examples
+    attributes:
+      label: Real product examples
+      description: Link or describe similar wait states from real products.
+      placeholder: GitHub import progress, Notion AI tool calls, Stripe file upload validation.
+    validations:
+      required: true
+  - type: textarea
+    id: misuse
+    attributes:
+      label: When should this loader not be used?
+      description: Good loaders have clear misuse cases.
+      placeholder: Do not use it for button submits because the animation needs too much space.

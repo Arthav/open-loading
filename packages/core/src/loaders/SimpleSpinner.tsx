@@ -8,6 +8,7 @@ export function SimpleSpinner(props: LoaderProps) {
       defaultMessage="Loading..."
       label="Simple spinner loading state"
       submessage="Fetching the latest state"
+      supportsError={false}
     >
       <span className="ol-spinner" aria-hidden="true" />
     </LoaderFrame>
